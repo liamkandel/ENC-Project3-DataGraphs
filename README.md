@@ -25,5 +25,81 @@ I plotted the data using Seaborn:
 
 ![bar-birthregion](https://github.com/liamkandel/ENC-Project3-DataGraphs/assets/84248497/afa1220a-9788-4c9f-8437-47d63c6ba5ec)
 
+# Code for Dataset and Plot creation
+```import random
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import json
 
+SIZE = 500 # How many applicants to generate
 
+genders = ["Man", "Woman"]
+races = ["White", "Non-white"]
+education_level = ["Ivy League", "Public University"]
+birth_place = ["US Born", "Born outside of US"]
+
+applicants = {"Name": [], "Gender": [], "Race": [], "Salary": [], "Age": [], "Education": [] , "Birth Region": []}
+
+for i in range(SIZE):
+    # Give each applicant a standard name indicating their number
+    applicants["Name"].append("Applicant " + str(i + 1))
+    # Give each applicant a random gender
+    applicants["Gender"].append(random.choice(genders))
+    # Give each applicant a random race
+    applicants["Race"].append(random.choice(races))
+    # Give each applicant an education
+    applicants["Education"].append(random.choice(education_level))
+    # Give each applicant an age
+    applicants["Age"].append(random.randint(22,60))
+    # Give each applicant a birth region
+    applicants["Birth Region"].append(random.choice(birth_place))
+    # Randomly generate a base salary for each applicant
+    applicants["Salary"].append(random.randint(50000, 56000))
+
+    # Here is where the bias ensues...
+
+    if applicants["Gender"][i] == "Man":
+        applicants["Salary"][i] *= 1.1
+    else:
+        applicants["Salary"][i] *= 0.95
+
+    if applicants["Race"][i] == "White":
+        applicants["Salary"][i] *= 1.1
+    else:
+        applicants["Salary"][i] *= 0.95
+
+    if applicants["Education"][i] == "Ivy League":
+        applicants["Salary"][i] *= 1.1
+    else:
+        applicants["Salary"][i] *= 0.95
+    
+   # if applicants["Age"][i] >= 40:
+    applicants["Salary"][i] *= applicants["Age"][i] / 40
+    #else:
+        #applicants["Salary"][i] *= 0.95
+    
+    if applicants["Birth Region"][i] == "US Born":
+        applicants["Salary"][i] *= 1.1
+    else:
+        applicants["Salary"][i] *= 0.95
+    
+    # Round the salary to 2 decimal places.
+    applicants["Salary"][i] = round(applicants["Salary"][i], 2)
+    
+
+# Create an applicants.json and write the applicants into it
+with open("applicants.json", "w") as outfile:
+    json.dump(applicants, outfile)
+
+# Create a dataframe using the json above
+df = pd.read_json("applicants.json")
+
+g = sns.lineplot(data=df, x="Age", y="Salary", hue="Gender")
+g = sns.lineplot(data=df, x="Age", y="Salary", hue="Birth Region")
+g = sns.lineplot(data=df, x="Age", y="Salary", hue="Education")
+g = sns.lineplot(data=df, x="Age", y="Salary", hue="Race")
+
+g = sns.barplot(data=df, x="Gender", y="Salary", hue="Race")
+g = sns.barplot(data=df, x="Gender", y="Salary", hue="Education")
+g = sns.barplot(data=df, x="Gender", y="Salary", hue="Birth Region")```
